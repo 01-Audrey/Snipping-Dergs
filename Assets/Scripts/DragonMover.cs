@@ -2,39 +2,37 @@ using UnityEngine;
 
 // ============================================================
 // DragonMover.cs
-// Assigned to: Dane Audrey
-// Purpose: Controls dragon flight movement across the screen.
-//          Dragon enters from left or right, flies with a
-//          sine wave vertical wobble, despawns on exit.
-// How to use:
-//   1. Attach this script to the Dragon prefab.
-//   2. Set speed, wobbleFrequency, wobbleAmplitude in Inspector.
-//   3. The DragonSpawner will set moveDirection before spawning.
+// Purpose: Dragon spawns from left or right edge and flies
+//          across the screen with a sine wave wobble.
+//          Works with Unity's Orthographic 2D camera.
 // ============================================================
 
 public class DragonMover : MonoBehaviour
 {
     [Header("Flight Settings")]
-    public float speed = 3f;              // How fast the dragon moves horizontally
-    public float wobbleFrequency = 2f;    // How fast it bobs up and down
-    public float wobbleAmplitude = 0.5f;  // How far it bobs up and down
-
-    [Header("Direction")]
-    public float moveDirection = 1f;      // 1 = left to right, -1 = right to left
+    public float speed = 3f;
+    public float wobbleFrequency = 2f;
+    public float wobbleAmplitude = 0.4f;
 
     [Header("Screen Bounds")]
-    public float exitBuffer = 1.5f;       // How far past screen edge before despawning
+    public float exitBuffer = 2f;
 
-    private float startY;                 // Starting Y position (for wobble reference)
-    private float timeAlive = 0f;         // Tracks time for sine wave
-    private bool isDead = false;          // Set by DragonHealth when shot
-
+    private float startY;
+    private float timeAlive = 0f;
+    private bool isDead = false;
+    private float moveDirection = 1f;
     private SpriteRenderer sr;
 
     void Start()
     {
-        startY = transform.position.y;
         sr = GetComponent<SpriteRenderer>();
+        startY = transform.position.y;
+
+        // Determine direction based on spawn X position
+        if (transform.position.x > 0)
+            moveDirection = -1f;  // Spawn right, move left
+        else
+            moveDirection = 1f;   // Spawn left, move right
 
         // Flip sprite based on direction
         if (sr != null)
@@ -43,7 +41,6 @@ public class DragonMover : MonoBehaviour
 
     void Update()
     {
-        // Stop moving if dead (DragonHealth takes over)
         if (isDead) return;
 
         timeAlive += Time.deltaTime;
@@ -51,31 +48,25 @@ public class DragonMover : MonoBehaviour
         // Horizontal movement
         float newX = transform.position.x + moveDirection * speed * Time.deltaTime;
 
-        // Vertical sine wave wobble
+        // Sine wave vertical wobble
         float newY = startY + Mathf.Sin(timeAlive * wobbleFrequency) * wobbleAmplitude;
 
-        transform.position = new Vector3(newX, newY, transform.position.z);
+        transform.position = new Vector3(newX, newY, 0f);
 
-        // Check if dragon has exited the screen
+        // Check if exited screen
         float screenEdge = Camera.main.orthographicSize * Camera.main.aspect + exitBuffer;
         if (Mathf.Abs(transform.position.x) > screenEdge)
         {
-            OnDragonEscaped();
+            DragonHealth health = GetComponent<DragonHealth>();
+            if (health != null)
+                health.OnEscaped();
+            else
+                Destroy(gameObject);
         }
     }
 
-    // Called by DragonHealth when the dragon is shot
     public void StopFlying()
     {
         isDead = true;
-    }
-
-    private void OnDragonEscaped()
-    {
-        // Notify GameManager that this dragon escaped
-        if (GameManager.Instance != null)
-            GameManager.Instance.OnDragonEscaped();
-
-        Destroy(gameObject);
     }
 }

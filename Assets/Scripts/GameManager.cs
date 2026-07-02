@@ -4,16 +4,16 @@ using TMPro;
 // ============================================================
 // GameManager.cs
 // Purpose: Central controller — tracks score, rounds, kills,
-//          escapes. All other scripts talk to this.
+//          escapes. Tells DragonSpawner when to start/stop.
 // How to use:
-//   1. Attach to an empty GameObject called "GameManager".
-//   2. Assign scoreText and roundText in Inspector.
-//   3. This uses a Singleton pattern — access via GameManager.Instance
+//   1. Attach to empty GameObject called "GameManager"
+//   2. Drag DragonSpawner object into the spawner slot
+//   3. Assign scoreText and roundText (after making HUD)
 // ============================================================
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance;   // Singleton — access from any script
+    public static GameManager Instance;
 
     [Header("Round Settings")]
     public int dragonsPerRound = 5;
@@ -23,10 +23,10 @@ public class GameManager : MonoBehaviour
     public int pointsPerKill = 100;
     public int oneShotBonus = 50;
 
-    [Header("UI References")]
+    [Header("References")]
+    public DragonSpawner dragonSpawner;   // Drag DragonSpawner object here
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI roundText;
-    // Assign shot indicator images in Inspector (3 bullet icons)
 
     // Internal state
     private int currentScore = 0;
@@ -37,7 +37,6 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton setup
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
@@ -45,38 +44,51 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         UpdateUI();
+        StartRound();
     }
 
-    // Called by DragonHealth when dragon is shot
+    void StartRound()
+    {
+        dragonsKilled = 0;
+        dragonsEscaped = 0;
+        dragonsSpawnedThisRound = 0;
+
+        Debug.Log("Round " + currentRound + " started!");
+
+        if (dragonSpawner != null)
+            dragonSpawner.StartSpawning();
+        else
+            Debug.LogError("GameManager: No DragonSpawner assigned!");
+    }
+
     public void OnDragonKilled()
     {
         dragonsKilled++;
         dragonsSpawnedThisRound++;
         currentScore += pointsPerKill;
+        Debug.Log("Dragon killed! Score: " + currentScore);
         UpdateUI();
         CheckRoundEnd();
     }
 
-    // Called by DragonMover when dragon exits screen
     public void OnDragonEscaped()
     {
         dragonsEscaped++;
         dragonsSpawnedThisRound++;
+        Debug.Log("Dragon escaped! Escaped: " + dragonsEscaped);
         UpdateUI();
         CheckRoundEnd();
     }
 
-    // Called by MouseShoot for one-shot kill bonus
     public void AddBonusScore()
     {
         currentScore += oneShotBonus;
+        Debug.Log("One shot bonus! Score: " + currentScore);
         UpdateUI();
     }
 
-    // Called by MouseShoot to update bullet icons
     public void UpdateShotDisplay(int shotsRemaining)
     {
-        // TODO in Week 2: update bullet icon sprites here
         Debug.Log("Shots remaining: " + shotsRemaining);
     }
 
@@ -84,6 +96,9 @@ public class GameManager : MonoBehaviour
     {
         if (dragonsSpawnedThisRound >= dragonsPerRound)
         {
+            if (dragonSpawner != null)
+                dragonSpawner.StopSpawning();
+
             if (dragonsKilled >= killsRequiredToPass)
                 RoundClear();
             else
@@ -93,18 +108,17 @@ public class GameManager : MonoBehaviour
 
     private void RoundClear()
     {
-        Debug.Log("Round " + currentRound + " Clear!");
+        Debug.Log("Round " + currentRound + " Clear! Score: " + currentScore);
         currentRound++;
-        dragonsKilled = 0;
-        dragonsEscaped = 0;
-        dragonsSpawnedThisRound = 0;
-        // TODO: show RoundClear UI panel, then start next round
+        UpdateUI();
+        // TODO: show Round Clear UI panel, then call StartRound()
+        Invoke("StartRound", 2f); // 2 second delay before next round
     }
 
     private void GameOver()
     {
         Debug.Log("Game Over! Final Score: " + currentScore);
-        // TODO: show GameOver UI panel
+        // TODO: show Game Over UI panel
     }
 
     private void UpdateUI()

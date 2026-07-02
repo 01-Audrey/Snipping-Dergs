@@ -1,74 +1,100 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 // ============================================================
 // DragonHealth.cs
-// Assigned to: Fonzy Estrellado
-// Purpose: Handles hit detection and death for the dragon.
-//          When shot, dragon stops flying, falls under gravity,
-//          plays death animation, then despawns.
-// How to use:
-//   1. Attach this script to the Dragon prefab.
-//   2. Assign deathSprite in the Inspector (Death Derg Sprites).
-//   3. Make sure Dragon prefab has a Rigidbody2D and Collider2D.
-//   4. MouseShoot.cs calls TakeHit() when player clicks the dragon.
+// Supports different HP per dragon type:
+//   Green - 1 hit, regular speed
+//   White - 1 hit, fast
+//   Red   - 3 hits, tank
 // ============================================================
 
 public class DragonHealth : MonoBehaviour
 {
-    [Header("Death Settings")]
-    public Sprite deathSprite;            // Drag "Death Derg Sprites.png" here in Inspector
-    public float fallDelay = 0.15f;       // Short pause before gravity kicks in
-    public float destroyAfter = 2f;       // How long after death before despawning
+    [Header("Health Settings")]
+    public int maxHealth = 1;             // Set in Inspector: Green=1, White=1, Red=3
 
-    [Header("Flash Effect")]
-    public float flashDuration = 0.1f;    // How long the hit flash lasts
+    [Header("Death Sprite")]
+    public Sprite deathSprite;            // Assign matching death sprite in Inspector
+
+    [Header("Death Settings")]
+    public float flashDuration = 0.1f;
+    public float fallTime = 1.5f;         // How long to fall before disappearing
     public Color hitFlashColor = Color.red;
 
-    private bool isHit = false;           // Prevent being hit twice
+    // Event — tells DragonSpawner this dragon is done
+    public Action OnDragonDone;
+
+    private int currentHealth;
+    private bool isDead = false;
     private SpriteRenderer sr;
     private Rigidbody2D rb;
     private Collider2D col;
 
     void Start()
     {
+        currentHealth = maxHealth;
         sr  = GetComponent<SpriteRenderer>();
         rb  = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
 
-        // Make sure gravity is OFF while flying
         if (rb != null)
             rb.gravityScale = 0f;
     }
 
-    // --------------------------------------------------------
-    // TakeHit() — called by MouseShoot.cs on successful click
-    // --------------------------------------------------------
+    // Called by MouseShoot on click
     public void TakeHit()
     {
-        if (isHit) return;  // Already dead, ignore extra clicks
-        isHit = true;
+        if (isDead) return;
 
-        // Stop the dragon from flying
-        DragonMover mover = GetComponent<DragonMover>();
-        if (mover != null)
-            mover.StopFlying();
+        currentHealth--;
+        Debug.Log("Dragon hit! HP remaining: " + currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+        else
+        {
+            // Still alive — flash to show damage
+            StartCoroutine(HitFlash());
+        }
+    }
+
+    private IEnumerator HitFlash()
+    {
+        if (sr != null)
+        {
+            sr.color = hitFlashColor;
+            yield return new WaitForSeconds(flashDuration);
+            sr.color = Color.white;
+        }
+    }
+
+    private void Die()
+    {
+        isDead = true;
 
         // Disable collider so it can't be clicked again
         if (col != null)
             col.enabled = false;
 
-        // Notify GameManager — dragon was killed
+        // Stop flying
+        DragonMover mover = GetComponent<DragonMover>();
+        if (mover != null)
+            mover.StopFlying();
+
+        // Notify GameManager
         if (GameManager.Instance != null)
             GameManager.Instance.OnDragonKilled();
 
-        // Start death sequence
         StartCoroutine(DeathSequence());
     }
 
     private IEnumerator DeathSequence()
     {
-        // 1. Flash red to show hit
+        // Flash red
         if (sr != null)
         {
             sr.color = hitFlashColor;
@@ -76,20 +102,33 @@ public class DragonHealth : MonoBehaviour
             sr.color = Color.white;
         }
 
-        // 2. Swap to death sprite
+        // Swap to death sprite
         if (sr != null && deathSprite != null)
             sr.sprite = deathSprite;
 
-        // 3. Brief pause then enable gravity so dragon falls
-        yield return new WaitForSeconds(fallDelay);
+        // Enable gravity — dragon falls
         if (rb != null)
         {
-            rb.gravityScale = 2f;   // Adjust fall speed here
+            rb.gravityScale = 2f;
             rb.linearVelocity = Vector2.zero;
         }
 
-        // 4. Destroy after falling
-        yield return new WaitForSeconds(destroyAfter);
+        // Wait then disappear
+        yield return new WaitForSeconds(fallTime);
+
+        OnDragonDone?.Invoke();
+        Destroy(gameObject);
+    }
+
+    // Called by DragonMover when dragon exits screen
+    public void OnEscaped()
+    {
+        if (isDead) return;
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnDragonEscaped();
+
+        OnDragonDone?.Invoke();
         Destroy(gameObject);
     }
 }
