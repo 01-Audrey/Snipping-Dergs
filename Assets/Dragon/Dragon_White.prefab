@@ -10,13 +10,13 @@ GameObject:
   m_Component:
   - component: {fileID: 7989178949554038111}
   - component: {fileID: 7111527870454227404}
-  - component: {fileID: -225362521449037970}
   - component: {fileID: 8489987837460687681}
   - component: {fileID: -3192553432491047535}
   - component: {fileID: -4635701500979221148}
+  - component: {fileID: -1299923536185859046}
   m_Layer: 0
   m_Name: Dragon_White
-  m_TagString: Untagged
+  m_TagString: Dragon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5792686, y: 0.5047177, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_Sprite: {fileID: -1202675710495413733, guid: a0e94bbcf8f09ce46b630e1a0d959943, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -94,23 +94,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-225362521449037970
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1944976125488027681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54f17010f91039f4aaa318950fa017eb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DragonHealth
-  maxHealth: 1
-  deathSprite: {fileID: 5145170651113997640, guid: 9d9644f36a8e99f4b929bd98964d2d65, type: 3}
-  flashDuration: 0.1
-  fallTime: 1.5
-  hitFlashColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &8489987837460687681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,6 +109,8 @@ MonoBehaviour:
   speed: 5
   wobbleFrequency: 2
   wobbleAmplitude: 0.4
+  tiltAmount: 15
+  tiltSpeed: 8
   exitBuffer: 2
 --- !u!50 &-3192553432491047535
 Rigidbody2D:
@@ -200,3 +185,20 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 6.08, y: 7.941069}
   m_EdgeRadius: 0
+--- !u!114 &-1299923536185859046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944976125488027681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54f17010f91039f4aaa318950fa017eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DragonHealth
+  maxHealth: 1
+  deathSprite: {fileID: 5145170651113997640, guid: 9d9644f36a8e99f4b929bd98964d2d65, type: 3}
+  flashDuration: 0.1
+  fallTime: 1.5
+  hitFlashColor: {r: 1, g: 0, b: 0, a: 1}

@@ -387,7 +387,7 @@ MonoBehaviour:
   dragonGreenPrefab: {fileID: 820648845009272807, guid: 795afa827353e244b91ec54a8dba3fc2, type: 3}
   dragonRedPrefab: {fileID: 1893178254885434089, guid: 365a3e3d6ae2bf94287c3be75c8bad51, type: 3}
   dragonWhitePrefab: {fileID: 1944976125488027681, guid: 457e02e952b42e24cbbd79ac7ec26bc0, type: 3}
-  spawnDelay: 2
+  spawnDelay: 1
   spawnXOffset: 10
   spawnYRange: 1.5
 --- !u!1 &1085840162
@@ -823,7 +823,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -979068571380978308, guid: 2c1e79a067471cf4a963efb9fee0bb68, type: 3}
+  m_Sprite: {fileID: 6317659529707932946, guid: 44aff12815469524ab25cecb9a96f1a8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

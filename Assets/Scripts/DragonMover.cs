@@ -2,17 +2,19 @@ using UnityEngine;
 
 // ============================================================
 // DragonMover.cs
-// Purpose: Dragon spawns from left or right edge and flies
-//          across the screen with a sine wave wobble.
-//          Works with Unity's Orthographic 2D camera.
+// Dragon walks left-right while moving across screen
 // ============================================================
 
 public class DragonMover : MonoBehaviour
 {
     [Header("Flight Settings")]
-    public float speed = 3f;
-    public float wobbleFrequency = 2f;
+    public float speed = 4f;
+    public float wobbleFrequency = 3f;
     public float wobbleAmplitude = 0.4f;
+
+    [Header("Walk Animation")]
+    public float tiltAmount = 15f;
+    public float tiltSpeed = 8f;
 
     [Header("Screen Bounds")]
     public float exitBuffer = 2f;
@@ -28,13 +30,11 @@ public class DragonMover : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         startY = transform.position.y;
 
-        // Determine direction based on spawn X position
         if (transform.position.x > 0)
-            moveDirection = -1f;  // Spawn right, move left
+            moveDirection = -1f;
         else
-            moveDirection = 1f;   // Spawn left, move right
+            moveDirection = 1f;
 
-        // Flip sprite based on direction
         if (sr != null)
             sr.flipX = (moveDirection < 0);
     }
@@ -45,15 +45,15 @@ public class DragonMover : MonoBehaviour
 
         timeAlive += Time.deltaTime;
 
-        // Horizontal movement
         float newX = transform.position.x + moveDirection * speed * Time.deltaTime;
-
-        // Sine wave vertical wobble
         float newY = startY + Mathf.Sin(timeAlive * wobbleFrequency) * wobbleAmplitude;
 
         transform.position = new Vector3(newX, newY, 0f);
 
-        // Check if exited screen
+        // Tilt left and right to simulate walking
+        float tilt = Mathf.Sin(timeAlive * tiltSpeed) * tiltAmount;
+        transform.rotation = Quaternion.Euler(0f, 0f, tilt);
+
         float screenEdge = Camera.main.orthographicSize * Camera.main.aspect + exitBuffer;
         if (Mathf.Abs(transform.position.x) > screenEdge)
         {
@@ -68,5 +68,6 @@ public class DragonMover : MonoBehaviour
     public void StopFlying()
     {
         isDead = true;
+        transform.rotation = Quaternion.identity;
     }
 }
