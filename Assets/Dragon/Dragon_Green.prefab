@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -2907108958984210467}
   - component: {fileID: 5725123245542910406}
   - component: {fileID: -3604419963136769358}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Dragon_Green
   m_TagString: Dragon
   m_Icon: {fileID: 0}
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5792686, y: 0.5047177, z: 1}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 1
   m_Sprite: {fileID: -5166371813799362759, guid: a0e94bbcf8f09ce46b630e1a0d959943, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -106,7 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85e660f9a5025f74fb63ca46c483c2e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragonMover
-  speed: 3
+  speed: 8
   wobbleFrequency: 2
   wobbleAmplitude: 0.4
   tiltAmount: 15

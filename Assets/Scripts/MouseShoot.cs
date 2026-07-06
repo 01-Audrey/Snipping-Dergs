@@ -11,6 +11,10 @@ public class MouseShoot : MonoBehaviour
     [Header("Shot Settings")]
     public int maxShotsPerDragon = 3;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip gunshotClip;
+
     private int shotsRemaining;
     private Camera mainCam;
 
@@ -34,6 +38,9 @@ public class MouseShoot : MonoBehaviour
         if (shotsRemaining <= 0) return;
 
         shotsRemaining--;
+
+        if (audioSource != null && gunshotClip != null)
+            audioSource.PlayOneShot(gunshotClip);
 
         // Get mouse position using new Input System
         Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
